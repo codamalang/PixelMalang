@@ -1,6 +1,7 @@
-# ProxieLBot-SE
-ProxieLBot for launcher
+# MetroVoltBot
+MetroVoltBot for launcher
 ## 읽어보기
-* [프로그램의 정체성에 관한 문서](res/about.md)
-* [코드 스타일에 관한 규칙](res/CodeStyle.md)
-* [코드 스타일 개선에 관한 규칙](res/CodeFix.md)
+* [잡담](res/about.md)
+* [코드 스타일](res/CodeStyle.md)
+* [코드 스타일 개선](res/CodeFix.md)
+근데 코드 스타일 본인도 안지킴
