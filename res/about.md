@@ -2,7 +2,7 @@
 
 ## 개요
 띵킹전지(metro764.sr001)(이하 개발자)가 개발하고 배포하는 discord.py 기반 오픈소스 디스코드 봇
-[링크](<https://github.com/volta1147/ProxieLBot>) [베타](<https://github.com/volta1147/MetroVoltBot>) 
+[링크](<https://github.com/volta1147/ProximaBot>) [베타](<https://github.com/volta1147/MetroVoltBot>) 
 2024년 6월 11일 기준 최신 버전은 0.1.2461이다.
 
 ## 역사
