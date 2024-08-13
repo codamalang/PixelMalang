@@ -1,12 +1,10 @@
-'''실행 파일'''
-
 import sys
 sys.path.append("\\".join(sys.argv[0].split("/")[:-1]))
 
 import discord
 from discord.ext import commands
 import lib.botsetup as bs
-from launchio import lndir, pathname
+from launchio import lndir
 
 print("Starting...")
 
@@ -66,4 +64,3 @@ bot.run(bs.token)
 # based on VoltaBot 2.2
 # made by volta1538(VoltLamp)
 # original bot made by volta1538(VoltLamp)
-# e-mail : dnaipoz.noipdsa@gmail.com

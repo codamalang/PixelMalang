@@ -3,10 +3,6 @@ from discord import app_commands
 from discord.ext import commands
 import random
 import asyncio
-from launchio import pathname
-
-import sys
-sys.path.append(pathname)
 
 # 여기에 사용자 정의 라이브러리 넣기
 

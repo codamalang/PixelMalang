@@ -1,13 +1,10 @@
 import discord
 import time
-from launchio import lndir, pathname
-
-import sys
-sys.path.append(pathname[:-1])
-
+from launchio import lndir, ln
 import lib.botsetup as bs
 import lib.file as file
 
+pf = ln("res", "memoprefix.txt").read()
 
 def getusercolor(ctx, userid):
     color = 0x000000
@@ -16,12 +13,43 @@ def getusercolor(ctx, userid):
             color = str(i.color)
     return int("0x"+color[1:], 16)
 
-async def sendprofileembed(ctx, userinfo, pfver = -1):
+def open_name(filenamein: str):
+    if ln("community", "memo", filenamein).isfile():
+        if (file.openfile("memo", filenamein).split())[0] == pf + "redirect":
+            filename = " ".join((file.openfile("memo", filenamein).split())[1:])
+        else:
+            filename = filenamein
+        return filename
+    else:
+        return filenamein
+
+def memo_embed(filename: str, pfver = -1):
+    if lndir("community", "rev", filename).isdir():
+        if pfver >= 0:
+            ver = str(pfver)
+        else:
+            ver = file.getver('rev', filename)
+        if file.isrev("rev", filename, ver):
+            embed = discord.Embed(title = filename, description = file.openrev("rev", filename, ver), color = 0xbdb092)
+            embed.set_footer(text = file.memover('memo', filename, ver))
+            state = "OK"
+        else:
+            embed = discord.Embed(title = filename, description = "해당 버전이 없습니다. ", color = 0xFF0000)
+            embed.set_footer(text = "Error")
+            state = "NoRev"
+    else:
+        embed = discord.Embed(title = "filename", description = "해당 문서가 없습니다. ", color = 0xFF0000)
+        embed.set_footer(text = "Error")
+        state = "NoMemo"
+    
+    return state, embed
+
+async def profile_embed(ctx, userinfo, pfver = -1):
     name = userinfo.name
     userid = userinfo.id
-    if lndir("profilerev", str(userid)).isdir():
-        if pfver + 1:
-            ver = pfver
+    if lndir("community", "profilerev", str(userid)).isdir():
+        if pfver >= 0:
+            ver = str(pfver)
         else:
             ver = file.getver('profilerev', str(userid))
         if file.isrev('profilerev', str(userid), ver):
@@ -49,7 +77,7 @@ class MemoUIBeta(discord.ui.View):
         file.rev("rev", "ButtonTest", time.asctime(time.localtime()))
         await interaction.response.send_message("수?정")
 
-class SelectMenu(discord.ui.Select):
+class MemoSelect(discord.ui.Select):
     def __init__(self):
         options = [discord.SelectOption(label="열기",description="문서를 엽니다. ", emoji="📕"),
                 discord.SelectOption(label="수정",description="문서를 수정합니다. ", emoji="🖊️"),
@@ -58,13 +86,11 @@ class SelectMenu(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.send_message(content=f"{self.values}", ephemeral=True)
-        if self.values[0] == "수정":
-            await interaction.response.send_modal(WriteModal())
 
 class Select(discord.ui.View):
     def __init__(self):
         super().__init__()
-        self.add_item(SelectMenu())
+        self.add_item(MemoSelect())
 
 class WriteModal(discord.ui.Modal, title = "글쓰기"):
     memo_title = discord.ui.TextInput(label="제목", placeholder="제목을 적어주세요. ", style=discord.TextStyle.short)
@@ -72,3 +98,9 @@ class WriteModal(discord.ui.Modal, title = "글쓰기"):
 
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.send_message(f"제목 : {self.memo_title}\n{"="*20}\n{self.memo_contx}")
+
+class OpenModal(discord.ui.Modal, title = "불러오기"):
+    memo_title = discord.ui.TextInput(label="제목", placeholder="제목을 적어주세요. ", style=discord.TextStyle.short)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.send_message(f"제목 : {self.memo_title}")

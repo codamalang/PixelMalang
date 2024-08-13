@@ -1,4 +1,5 @@
 import os
+import sys
 from typing import Literal
 
 sep = os.path.sep
@@ -78,6 +79,9 @@ class lndir:
     
     def listdir(self):
         return os.listdir(self.path)
+
+def setpath():
+    sys.path.append(pathname[:-1])
 
 if __name__ == "__main__":
     print("bot launch lib info")

@@ -2,16 +2,27 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 import asyncio
-from launchio import ln, pathname
-
-import sys
-sys.path.append(pathname)
-
 import lib.botsetup as bs
 import lib.file as file
 import lib.MemoUI as MemoUI
 
-pf = ln("res", "memoprefix.txt").read()
+class MemoSelect(MemoUI.MemoSelect):
+    def __init__(self):
+        super().__init__()
+
+    async def callback(self, interaction: discord.Interaction):
+        # await interaction.response.send_message(content=f"{self.values}", ephemeral=True)
+        if self.values[0] == "열기":
+            await interaction.response.send_modal(OpenModal())
+        if self.values[0] == "수정":
+            await interaction.response.send_modal(WriteModal())
+        if self.values[0] == "종료":
+            await interaction.delete_original_response()
+
+class Select(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(MemoSelect())
 
 class WriteModal(MemoUI.WriteModal):
     async def on_submit(self, interaction: discord.Interaction):
@@ -21,7 +32,16 @@ class WriteModal(MemoUI.WriteModal):
         file.rev("rev", filename, memo)
         embed = discord.Embed(title = filename, description = file.openfile("memo", filename), color = 0xbdb092)
         embed.set_footer(text = file.memover('memo', filename, file.getver('rev', filename)))
-        await interaction.response.send_message(embed=embed)
+        return await interaction.response.send_message(embed=embed, ephemeral=True)
+
+class OpenModal(MemoUI.OpenModal):
+    async def on_submit(self, interaction: discord.Interaction):
+        memo_title = str(self.memo_title)
+        memo_state, embed = MemoUI.memo_embed(memo_title)
+        if not memo_state == "OK":
+            return await interaction.response.send_message(content="메모를 찾지 못했습니다. ", embed=embed, ephemeral=True)
+        else:
+            return await interaction.response.send_message(embed=embed)
 
 class Memo(commands.Cog):
     def __init__(self, bot):
@@ -34,10 +54,7 @@ class Memo(commands.Cog):
 
     @memo.command(name = "open", help = "메모를 출력합니다.")
     async def openm(self, ctx:commands.Context, *, filenamein):
-        if (file.openfile("memo", filenamein).split())[0] == pf + "redirect":
-            filename = " ".join((file.openfile("memo", filenamein).split())[1:])
-        else:
-            filename = filenamein
+        filename = MemoUI.open_name(filenamein)
         if file.ismemo(filename):
             embed = discord.Embed(title = filename, description = file.openfile("memo", filename), color = 0xbdb092)
             embed.set_footer(text = file.memover('memo', filename, file.getver('rev', filename)))
@@ -46,6 +63,14 @@ class Memo(commands.Cog):
             await memoembed.edit(view=None)
         else:
             await ctx.send(filename+" 메모가 없습니다. "+filename+" 메모를 생성하려면 \n```"+bs.prefix+"memo edit "+filename+" 메모 내용```\n 을 입력하세요.")
+
+    @memo.command(name = "open2")
+    async def openm2(self, ctx:commands.Context, *, filenamein):
+        memo_state, embed = MemoUI.memo_embed(filenamein)
+        memo_cont = await ctx.send(embed=embed, view=MemoUI.MemoUIBeta())
+        if memo_state == "OK":
+            await asyncio.sleep(30)
+            await memo_cont.edit(view=None)
 
     @memo.command(help = "메모를 작성/수정합니다. ")
     async def edit(self, ctx, filenamein, *, memoin):
@@ -75,7 +100,7 @@ class Memo(commands.Cog):
             userinfo = ctx.message.author
         else:
             userinfo = await commands.MemberConverter.convert(self=commands.MemberConverter, ctx=ctx, argument=user)
-        await MemoUI.sendprofileembed(ctx, userinfo, -1)
+        await MemoUI.profile_embed(ctx, userinfo, -1)
 
     @commands.command(help = "자기소개를 작성/수정합니다. ")
     async def introduce(self, ctx, *, memo):
@@ -110,12 +135,12 @@ class Memo(commands.Cog):
     @rev.command(name = "profile", help = "맨션한 유저의 유저 정보 리버전을 불러옵니다. ")
     async def pfrev(self, ctx, user, pfver = -1):
         userinfo = await commands.MemberConverter.convert(self=commands.MemberConverter, ctx=ctx, argument=user)
-        await MemoUI.sendprofileembed(ctx, userinfo, pfver)
+        await MemoUI.profile_embed(ctx, userinfo, pfver)
 
     @rev.command(name = "myprofile", help = "자신의 유저 정보 리버전을 불러옵니다. ")
     async def mypfrev(self, ctx, pfver = -1):
         userinfo = ctx.message.author
-        await MemoUI.sendprofileembed(ctx, userinfo, pfver)
+        await MemoUI.profile_embed(ctx, userinfo, pfver)
     
     @commands.group(name = "back", help = "메모 되돌리기 관련")
     async def backrev(self, ctx):
@@ -137,7 +162,7 @@ class Memo(commands.Cog):
 
     @uitest.command(name = "menu", description = "메뉴창 테스트")
     async def selecttest(self, interaction:discord.Interaction):
-        await interaction.response.send_message(content="실행할 동작을 골라주세요. ", view=MemoUI.Select(), ephemeral=True)
+        await interaction.response.send_message(content="실행할 동작을 골라주세요. ", view=Select(), ephemeral=True)
 
     @uitest.command(name = "editor", description = "메시지 수정 테스트")
     async def modaltest(self, interaction:discord.Interaction):

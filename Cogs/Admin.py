@@ -1,9 +1,6 @@
 import discord
 from discord.ext import commands
-from launchio import pathname
-
-import sys
-sys.path.append(pathname[:-1])
+from datetime    import timedelta
 
 # 여기에 사용자 정의 라이브러리 넣기
 
@@ -30,6 +27,9 @@ class Admin(commands.Cog):
     # async def byebye(self, ctx):
     #     await ctx.send("ㅂㅂ")
     #     quit()
+    @admin.command(name = "KillYourSelf", help = "자폭")
+    async def FuckDev(self, ctx:commands.Context, times, reason):
+        await ctx.author.timeout(timedelta(seconds=float(times)), reason=reason)
 
 async def setup(bot):
     await bot.add_cog(Admin(bot))
