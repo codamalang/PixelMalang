@@ -8,4 +8,4 @@ community/rev
 *.pyc
 voice.mp3
 !res/security/securityfiles.txt
-test
+pythoncode/test.py

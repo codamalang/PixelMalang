@@ -24,6 +24,7 @@ def open_name(filenamein: str):
         return filenamein
 
 def memo_embed(filename: str, pfver = -1):
+    print(filename)
     if lndir("community", "rev", filename).isdir():
         if pfver >= 0:
             ver = str(pfver)
@@ -38,7 +39,7 @@ def memo_embed(filename: str, pfver = -1):
             embed.set_footer(text = "Error")
             state = "NoRev"
     else:
-        embed = discord.Embed(title = "filename", description = "해당 문서가 없습니다. ", color = 0xFF0000)
+        embed = discord.Embed(title = filename, description = "해당 문서가 없습니다. ", color = 0xFF0000)
         embed.set_footer(text = "Error")
         state = "NoMemo"
     
