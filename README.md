@@ -1,4 +1,4 @@
-# MetroVoltBot
+# PixelMalang
 ProximaBot ~~beta~~
 ## 읽어보기
 * [잡담](res/about.md)
