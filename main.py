@@ -50,6 +50,12 @@ async def ping(ctx):
 async def echo(ctx, *, abc):
     await ctx.send(abc)
 
+@bot.command(help = "입력한 내용을 출력합니다")
+async def info(ctx):
+    embed = discord.Embed(title = "PixelMalang", description = f"볼타서버 공식 봇", color = 0x747F00)
+    embed.set_footer(text = bs.version + ", By metro764.sr001")
+    await ctx.send(embed=embed)
+
 @bot.command(help = "봇을 종료합니다. 봇 관리자만 이용 가능")
 async def shutdown(ctx):
     if ctx.message.author.id == int(bs.myid):
