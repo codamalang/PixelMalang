@@ -4,7 +4,7 @@ from typing import Literal
 
 sep = os.path.sep
 
-pathname = sep.join(__file__.split("\\")[:-1])+sep
+pathname = sep.join(__file__.split(sep)[:-1])+sep
 
 class ln:
     def __init__(self, *args, form = ""):
