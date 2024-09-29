@@ -1,5 +1,5 @@
 import sys
-sys.path.append(sep.join(sys.argv[0].split(sep)[:-1]))
+sys.path.append(sep.join(sys.argv[0].split("/)[:-1]))
 
 import discord
 from discord.ext import commands
