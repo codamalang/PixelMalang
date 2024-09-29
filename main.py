@@ -1,4 +1,8 @@
 import sys
+import os
+
+sep = os.path.sep
+
 sys.path.append(sep.join(sys.argv[0].split("/)[:-1]))
 
 import discord
